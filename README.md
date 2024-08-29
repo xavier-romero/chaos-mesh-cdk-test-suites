@@ -34,3 +34,8 @@ Now you just run to invoke attacknet with the desired test:
 ```
 attacknet start cdk-network
 ```
+
+# References
+- [Attacknet](https://github.com/crytic/attacknet) + [DOC](https://github.com/crytic/attacknet/blob/main/docs/DOCUMENTATION.md)
+- [Chaos Mesh](https://chaos-mesh.org/docs/)
+    - [Chaos Mesh Stress](https://chaos-mesh.org/docs/simulate-heavy-stress-on-kubernetes/), etc
