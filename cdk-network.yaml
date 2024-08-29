@@ -1,0 +1,207 @@
+attacknetConfig:
+  waitBeforeInjectionSeconds: 1
+  reuseDevnetBetweenRuns: true
+  existingDevnetNamespace: "kt-cdk"
+  allowPostFaultInspection: true
+
+# Not used as we're not deploying L1, but otherwise attacknet refuses to start
+harnessConfig:
+  networkConfig: default.yaml
+  networkType: ethereum
+
+testConfig:
+  tests:
+
+  - testName: network-latency-executor
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: delay
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'executor001'
+          delay:
+            latency: '5s'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-latency-sequencer
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: delay
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          delay:
+            latency: '5s'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-latency-rpc
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: delay
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'rpc001'
+          delay:
+            latency: '5s'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-partition-exec-seq
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: partition
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'executor001'
+          direction: both
+          target:
+            mode: all
+            selector:
+              labelSelectors:
+                'kurtosistech.com/id': 'sequencer001'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-loss-executor
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: loss
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'executor001'
+          loss:
+            loss: '50'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-loss-sequencer
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: loss
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          loss:
+            loss: '50'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-corrupt-executor
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: corrupt
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'executor001'
+          corrupt:
+            corrupt: '50'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-corrupt-sequencer
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: corrupt
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          corrupt:
+            corrupt: '50'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-duplicate-executor
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: duplicate
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'executor001'
+          duplicate:
+            duplicate: '50'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-duplicate-sequencer
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: duplicate
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          duplicate:
+            duplicate: '50'
+          duration: 30s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate

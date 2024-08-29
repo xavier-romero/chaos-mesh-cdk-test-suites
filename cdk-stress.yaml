@@ -1,0 +1,175 @@
+attacknetConfig:
+  grafanaPodName: grafana
+  grafanaPodPort: 3000
+  waitBeforeInjectionSeconds: 1
+  reuseDevnetBetweenRuns: true
+  existingDevnetNamespace: "kt-cdk"
+  allowPostFaultInspection: true
+
+harnessConfig:
+  networkPackage: github.com/crytic/ethereum-package@0ed559c2661989b44cd2a44eca013acd64786f7f
+  networkConfig: default.yaml
+  networkType: ethereum
+
+testConfig:
+  tests:
+
+  - testName: network-latency-executor
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: delay
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'executor001'
+          delay:
+            latency: '10ms'
+            correlation: '100'
+            jitter: '0ms'
+          duration: 24s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: network-partition
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: NetworkChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          action: partition
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'executor001'
+          direction: both
+          target:
+            mode: all
+            selector:
+              labelSelectors:
+                'kurtosistech.com/id': 'sequencer001'
+          duration: 24s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: cpu-stress-executor
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject cpu stress to stateless executor'
+      chaosFaultSpec:
+        kind: StressChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'executor001'
+          stressors:
+            cpu:
+              workers: 30 # number of threads that apply stress defined by `load`. workers * load may exceed 100.
+              load: 50
+          duration: 24s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: cpu-stress-sequencer
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject cpu stress to sequencer'
+      chaosFaultSpec:
+        kind: StressChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          stressors:
+            cpu:
+              workers: 30 # number of threads that apply stress defined by `load`. workers * load may exceed 100.
+              load: 50
+          duration: 24s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  # - testName: test-chaos
+  #   planSteps:
+  #   - stepType: injectFault
+  #     description: Restart dummy service to validate chaos env
+  #     chaosFaultSpec:
+  #       kind: PodChaos
+  #       apiVersion: chaos-mesh.org/v1alpha1
+  #       spec:
+  #         action: pod-failure
+  #         duration: 5s
+  #         mode: all
+  #         selector:
+  #           labelSelectors:
+  #             kurtosistech.com/id: rpc001
+  #   - stepType: waitForFaultCompletion
+  #     description: wait for faults to terminate
+
+  # - testName: disk-latency-executor
+  #   planSteps:
+  #   - stepType: injectFault
+  #     description: Disk latency issues
+  #     chaosFaultSpec:
+  #       apiVersion: chaos-mesh.org/v1alpha1
+  #       kind: IOChaos
+  #       spec:
+  #         action: latency
+  #         mode: one
+  #         selector:
+  #           labelSelectors:
+  #             'kurtosistech.com/id': 'sequencer001'
+  #         volumePath: /
+  #         path: /app/config/*
+  #         delay: "100ms"
+  #         percent: 50
+  #         duration: "20s"
+  #   - stepType: waitForFaultCompletion
+  #     description: wait for faults to terminate
+
+  #   - stepType: injectFault
+  #     description: 'Inject cpu stress'
+  #     chaosFaultSpec:
+  #       kind: StressChaos
+  #       apiVersion: chaos-mesh.org/v1alpha1
+  #       spec:
+  #         mode: all
+  #         selector:
+  #           labelSelectors:
+  #             kurtosistech.com/id: cdk-erigon-sequencer-001
+  #         stressors:
+  #           cpu:
+  #             workers: 30 # number of threads that apply stress defined by `load`. workers * load may exceed 100.
+  #             load: 50
+  #         duration: 240s
+  #   - stepType: waitForFaultCompletion
+  #     description: wait for faults to terminate
+
+  #   - stepType: injectFault
+  #     description: 'Inject cpu stress'
+  #     chaosFaultSpec:
+  #       kind: StressChaos
+  #       apiVersion: chaos-mesh.org/v1alpha1
+  #       spec:
+  #         mode: all
+  #         selector:
+  #           labelSelectors:
+  #             kurtosistech.com/id: zkevm-dac-001
+  #         stressors:
+  #           cpu:
+  #             workers: 30 # number of threads that apply stress defined by `load`. workers * load may exceed 100.
+  #             load: 50
+  #         duration: 240s
+  #   - stepType: waitForFaultCompletion
+  #     description: wait for faults to terminate
+
+
