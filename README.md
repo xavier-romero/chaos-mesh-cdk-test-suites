@@ -37,7 +37,10 @@ That's because attacknet finds for tests inside test-suites relative to the curr
 Now you just run to invoke attacknet with the desired test:
 
 ```
+attacknet start cdk-time
+attacknet start cdk-stress
 attacknet start cdk-network
+etc.
 ```
 
 # Clean up
@@ -46,6 +49,7 @@ kurtosis clean -a
 kurtosis cluster set docker
 helm uninstall chaos-mesh -n=chaos-mesh
 helm repo remove chaos-mesh
+kubectl delete namespace chaos-mesh
 minikube stop
 ```
 
