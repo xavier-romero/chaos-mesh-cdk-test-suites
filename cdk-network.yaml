@@ -1,3 +1,5 @@
+# https://chaos-mesh.org/docs/simulate-network-chaos-on-kubernetes/
+
 attacknetConfig:
   waitBeforeInjectionSeconds: 1
   reuseDevnetBetweenRuns: true
@@ -27,7 +29,7 @@ testConfig:
               'kurtosistech.com/id': 'executor001'
           delay:
             latency: '5s'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
@@ -46,7 +48,7 @@ testConfig:
               'kurtosistech.com/id': 'sequencer001'
           delay:
             latency: '5s'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
@@ -65,7 +67,7 @@ testConfig:
               'kurtosistech.com/id': 'rpc001'
           delay:
             latency: '5s'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
@@ -88,7 +90,7 @@ testConfig:
             selector:
               labelSelectors:
                 'kurtosistech.com/id': 'sequencer001'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
@@ -107,7 +109,7 @@ testConfig:
               'kurtosistech.com/id': 'executor001'
           loss:
             loss: '50'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
@@ -126,7 +128,7 @@ testConfig:
               'kurtosistech.com/id': 'sequencer001'
           loss:
             loss: '50'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
@@ -145,7 +147,7 @@ testConfig:
               'kurtosistech.com/id': 'executor001'
           corrupt:
             corrupt: '50'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
@@ -164,7 +166,7 @@ testConfig:
               'kurtosistech.com/id': 'sequencer001'
           corrupt:
             corrupt: '50'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
@@ -183,7 +185,7 @@ testConfig:
               'kurtosistech.com/id': 'executor001'
           duplicate:
             duplicate: '50'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
@@ -202,6 +204,6 @@ testConfig:
               'kurtosistech.com/id': 'sequencer001'
           duplicate:
             duplicate: '50'
-          duration: 30s
+          duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate

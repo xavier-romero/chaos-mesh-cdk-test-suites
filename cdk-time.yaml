@@ -14,47 +14,53 @@ harnessConfig:
 testConfig:
   tests:
 
-  - testName: cpu-stress
+  - testName: time-executor
     planSteps:
     - stepType: injectFault
       description: 'Inject fault'
       chaosFaultSpec:
-        kind: StressChaos
+        kind: TimeChaos
         apiVersion: chaos-mesh.org/v1alpha1
         spec:
           mode: all
-          # The selector does not work as expected for local cluster because the whole system is stressed.
-          # However, if you don't set one, all pods are targeted and that throws an error.
           selector:
             labelSelectors:
               'kurtosistech.com/id': 'executor001'
-          stressors:
-            cpu:
-              workers: 30
-              load: 75
+          timeOffset: -10m100ns
           duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
 
-  - testName: memory-stress
+  - testName: time-rpc
     planSteps:
     - stepType: injectFault
       description: 'Inject fault'
       chaosFaultSpec:
-        kind: StressChaos
+        kind: TimeChaos
         apiVersion: chaos-mesh.org/v1alpha1
         spec:
           mode: all
-          # The selector does not work as expected for local cluster because the whole system is stressed.
-          # However, if you don't set one, all pods are targeted and that throws an error.
           selector:
             labelSelectors:
-              'kurtosistech.com/id': 'executor001'
-          stressors:
-            memory:
-              workers: 1
-              size: '75%'
-              time: '30s'
+              'kurtosistech.com/id': 'rpc001'
+          timeOffset: -10m100ns
+          duration: 60s
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: time-sequencer
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        kind: TimeChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        spec:
+          mode: all
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          timeOffset: -10m100ns
           duration: 60s
     - stepType: waitForFaultCompletion
       description: wait for faults to terminate
