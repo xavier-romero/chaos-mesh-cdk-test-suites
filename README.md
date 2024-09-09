@@ -11,6 +11,7 @@ git clone https://github.com/crytic/attacknet.git
 # I had to modify go.sum to use the right Kurtosis-API version matching my enginer
 cd attacknet && go build ./cmd/attacknet
 # copy resulting attacknet binary to any folder in your $PATH
+minikube start
 kubectl create ns chaos-mesh
 helm repo add chaos-mesh https://charts.chaos-mesh.org
 helm install chaos-mesh chaos-mesh/chaos-mesh -n=chaos-mesh --version 2.6.3
@@ -40,6 +41,7 @@ Now you just run to invoke attacknet with the desired test:
 attacknet start cdk-time
 attacknet start cdk-stress
 attacknet start cdk-network
+attacknet start cdk-iofaults
 etc.
 ```
 

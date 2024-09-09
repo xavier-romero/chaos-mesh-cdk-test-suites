@@ -1,0 +1,120 @@
+# https://chaos-mesh.org/docs/simulate-io-chaos-on-kubernetes/
+
+attacknetConfig:
+  waitBeforeInjectionSeconds: 1
+  reuseDevnetBetweenRuns: true
+  existingDevnetNamespace: "kt-cdk"
+  allowPostFaultInspection: true
+
+# Not used as we're not deploying L1, but otherwise attacknet refuses to start
+harnessConfig:
+  networkConfig: default.yaml
+  networkType: ethereum
+
+testConfig:
+  tests:
+
+  - testName: sequencer-config
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: IOChaos
+        spec:
+          action: latency
+          mode: one
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          volumePath: /etc/erigon
+          path: '//etc/erigon/config.yaml'
+          delay: '500ms'
+          percent: 50
+          duration: '30s'
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: sequencer-datastream.bin
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: IOChaos
+        spec:
+          action: latency
+          mode: one
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          volumePath: /datadir
+          path: '/datadir/data-stream.bin'
+          delay: '100ms'
+          percent: 10
+          duration: '1s'
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: sequencer-chaindata
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: IOChaos
+        spec:
+          action: latency
+          mode: one
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          volumePath: /datadir
+          path: '/datadir/chaindata/*'
+          delay: '100ms'
+          percent: 10
+          duration: '1s'
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: sequencer-datastream.db
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: IOChaos
+        spec:
+          action: latency
+          mode: one
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          volumePath: /datadir
+          path: '/datadir/data-stream.db/*'
+          delay: '500ms'
+          percent: 50
+          duration: '5s'
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
+
+  - testName: sequencer-txpool
+    planSteps:
+    - stepType: injectFault
+      description: 'Inject fault'
+      chaosFaultSpec:
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: IOChaos
+        spec:
+          action: latency
+          mode: one
+          selector:
+            labelSelectors:
+              'kurtosistech.com/id': 'sequencer001'
+          volumePath: /datadir
+          path: '/datadir/txpool/*'
+          delay: '100ms'
+          percent: 10
+          duration: '1s'
+    - stepType: waitForFaultCompletion
+      description: wait for faults to terminate
